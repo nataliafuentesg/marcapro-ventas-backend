@@ -24,7 +24,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSp
           AND (:status IS NULL OR p.status = :status)
           AND (:minPrice IS NULL OR p.price >= :minPrice)
           AND (:maxPrice IS NULL OR p.price <= :maxPrice)
-          AND (:city IS NULL OR LOWER(p.city) LIKE LOWER(CONCAT('%', :city, '%')))
+          AND (:city IS NULL OR LOWER(CAST(p.city AS string)) LIKE LOWER(CONCAT('%', :city, '%')))
           AND (:bedrooms IS NULL OR p.bedrooms >= :bedrooms)
     """)
     Page<Property> search(
