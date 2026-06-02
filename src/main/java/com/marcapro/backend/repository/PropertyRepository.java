@@ -18,18 +18,26 @@ public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSp
 
     List<Property> findByFeaturedTrueAndStatus(PropertyStatus status);
 
-    @Query("""
-        SELECT p FROM Property p
+    @Query(value = """
+        SELECT * FROM properties p
         WHERE (:type IS NULL OR p.type = :type)
           AND (:status IS NULL OR p.status = :status)
           AND (:minPrice IS NULL OR p.price >= :minPrice)
           AND (:maxPrice IS NULL OR p.price <= :maxPrice)
-          AND (:city IS NULL OR LOWER(CAST(p.city AS string)) LIKE LOWER(CONCAT('%', :city, '%')))
+          AND (:city IS NULL OR LOWER(p.city::text) LIKE LOWER(CONCAT('%', :city, '%')))
           AND (:bedrooms IS NULL OR p.bedrooms >= :bedrooms)
-    """)
+    """, countQuery = """
+        SELECT COUNT(*) FROM properties p
+        WHERE (:type IS NULL OR p.type = :type)
+          AND (:status IS NULL OR p.status = :status)
+          AND (:minPrice IS NULL OR p.price >= :minPrice)
+          AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+          AND (:city IS NULL OR LOWER(p.city::text) LIKE LOWER(CONCAT('%', :city, '%')))
+          AND (:bedrooms IS NULL OR p.bedrooms >= :bedrooms)
+    """, nativeQuery = true)
     Page<Property> search(
-        PropertyType type,
-        PropertyStatus status,
+        String type,
+        String status,
         BigDecimal minPrice,
         BigDecimal maxPrice,
         String city,

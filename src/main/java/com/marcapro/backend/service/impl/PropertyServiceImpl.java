@@ -53,7 +53,10 @@ public class PropertyServiceImpl implements PropertyService {
     public Page<PropertyDto.Summary> search(PropertyType type, PropertyStatus status,
                                              BigDecimal minPrice, BigDecimal maxPrice,
                                              String city, Integer bedrooms, Pageable pageable) {
-        return propertyRepository.search(type, status, minPrice, maxPrice, city, bedrooms, pageable)
+        return propertyRepository.search(
+                type != null ? type.name() : null,
+                status != null ? status.name() : null,
+                minPrice, maxPrice, city, bedrooms, pageable)
             .map(this::mapToSummary);
     }
 
