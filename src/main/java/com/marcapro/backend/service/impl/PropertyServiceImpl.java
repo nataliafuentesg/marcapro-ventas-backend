@@ -78,6 +78,18 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<PropertyDto.Summary> searchNearby(PropertyType type, PropertyStatus status,
+                                                   BigDecimal minPrice, BigDecimal maxPrice,
+                                                   Double lat, Double lng, Double radiusKm, Pageable pageable) {
+        return propertyRepository.searchNearby(
+                type != null ? type.name() : null,
+                status != null ? status.name() : null,
+                minPrice, maxPrice, lat, lng, radiusKm, pageable)
+            .map(this::mapToSummary);
+    }
+
+    @Override
     public void delete(Long id) {
         Property property = propertyRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Propiedad no encontrada: " + id));

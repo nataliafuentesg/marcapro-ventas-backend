@@ -20,6 +20,37 @@ public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSp
 
     @Query(value = """
         SELECT * FROM properties p
+        WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
+          AND (:type IS NULL OR p.type = :type)
+          AND (:status IS NULL OR p.status = :status)
+          AND (:minPrice IS NULL OR p.price >= :minPrice)
+          AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+          AND (6371 * acos(LEAST(1.0, cos(radians(:lat)) * cos(radians(p.latitude))
+               * cos(radians(p.longitude) - radians(:lng))
+               + sin(radians(:lat)) * sin(radians(p.latitude))))) <= :radiusKm
+        ORDER BY (6371 * acos(LEAST(1.0, cos(radians(:lat)) * cos(radians(p.latitude))
+               * cos(radians(p.longitude) - radians(:lng))
+               + sin(radians(:lat)) * sin(radians(p.latitude))))) ASC
+    """, countQuery = """
+        SELECT COUNT(*) FROM properties p
+        WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
+          AND (:type IS NULL OR p.type = :type)
+          AND (:status IS NULL OR p.status = :status)
+          AND (:minPrice IS NULL OR p.price >= :minPrice)
+          AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+          AND (6371 * acos(LEAST(1.0, cos(radians(:lat)) * cos(radians(p.latitude))
+               * cos(radians(p.longitude) - radians(:lng))
+               + sin(radians(:lat)) * sin(radians(p.latitude))))) <= :radiusKm
+    """, nativeQuery = true)
+    Page<Property> searchNearby(
+        String type, String status,
+        BigDecimal minPrice, BigDecimal maxPrice,
+        Double lat, Double lng, Double radiusKm,
+        Pageable pageable
+    );
+
+    @Query(value = """
+        SELECT * FROM properties p
         WHERE (:type IS NULL OR p.type = :type)
           AND (:status IS NULL OR p.status = :status)
           AND (:minPrice IS NULL OR p.price >= :minPrice)

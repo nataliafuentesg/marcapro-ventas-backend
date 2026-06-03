@@ -25,6 +25,20 @@ public class PropertyController {
 
     private final PropertyService propertyService;
 
+    @GetMapping("/nearby")
+    public ResponseEntity<Page<PropertyDto.Summary>> searchNearby(
+        @RequestParam Double lat,
+        @RequestParam Double lng,
+        @RequestParam(defaultValue = "10") Double radiusKm,
+        @RequestParam(required = false) PropertyType type,
+        @RequestParam(required = false) PropertyStatus status,
+        @RequestParam(required = false) BigDecimal minPrice,
+        @RequestParam(required = false) BigDecimal maxPrice,
+        @PageableDefault(size = 12) Pageable pageable
+    ) {
+        return ResponseEntity.ok(propertyService.searchNearby(type, status, minPrice, maxPrice, lat, lng, radiusKm, pageable));
+    }
+
     @GetMapping
     public ResponseEntity<Page<PropertyDto.Summary>> search(
         @RequestParam(required = false) PropertyType type,

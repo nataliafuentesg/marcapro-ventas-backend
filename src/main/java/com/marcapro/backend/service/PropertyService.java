@@ -16,6 +16,10 @@ public interface PropertyService {
     Page<PropertyDto.Summary> search(PropertyType type, PropertyStatus status,
                                       BigDecimal minPrice, BigDecimal maxPrice,
                                       String city, Integer bedrooms, Pageable pageable);
+
+    Page<PropertyDto.Summary> searchNearby(PropertyType type, PropertyStatus status,
+                                            BigDecimal minPrice, BigDecimal maxPrice,
+                                            Double lat, Double lng, Double radiusKm, Pageable pageable);
     List<PropertyDto.Summary> findFeatured();
     PropertyDto.Response update(Long id, PropertyDto.Request request);
     void delete(Long id);
